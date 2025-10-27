@@ -27,6 +27,20 @@ El proyecto usa Python 3.9+ y las siguientes dependencias:
 pip install numpy matplotlib
 ```
 
+### Instancias TSPLIB
+
+Para cumplir con los casos de prueba 51, 100 y 200 ciudades, tenemos los archivos .tsp dentro de la carpeta tsp/. con los ejemplos:
+
+- eil51.tsp (51 ciudades)
+
+- kroA100.tsp (100 ciudades)
+
+- kroA200.tsp (200 ciudades)
+
+Si deseas hacer mas pruebas 2D puedes buscar ejemplos y descargarlos desde el repositorio oficial:
+
+https://github.com/mastqe/tsplib/blob/master/kroA200.tsp
+
 ## Ejecucion y visualizacion
 
 Clona el repositorio con el comando
@@ -41,6 +55,8 @@ Ejecuta la aplicación con:
 cd ACO-Ant-Optimization-Algorithm
 python main.py
 ```
+
+En la interfaz inicial, podras encontrar los parametros para ingresar el numero de ciudades, en caso de que quieras generar n ciudades aleatorias y el numero de iteraciones que se realizaran o si lo prefieres cargar una instancia .tsp con el boton "Cargar TSPLIB"
 
 Durante la ejecución, la interfaz muestra:
 
@@ -61,20 +77,6 @@ Durante la ejecución, la interfaz muestra:
 Evolución del mejor costo (distancia mínima) a lo largo de las iteraciones.
 
 La simulación se actualiza dinámicamente, con una breve pausa entre iteraciones para apreciar el progreso de las hormigas.
-
-### Instancias TSPLIB
-
-Para cumplir con los casos de prueba 51, 100 y 200 ciudades, tenemos los archivos .tsp dentro de la carpeta tsp/. con los ejemplos:
-
-- eil51.tsp (51 ciudades)
-
-- kroA100.tsp (100 ciudades)
-
-- kroA200.tsp (200 ciudades)
-
-Si deseas hacer mas pruebas 2D descargarlos desde el repositorio oficial:
-
-https://github.com/mastqe/tsplib/blob/master/kroA200.tsp
 
 ## Autor:
 
