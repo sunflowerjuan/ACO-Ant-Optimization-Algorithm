@@ -14,54 +14,117 @@ class ACOApp:
     def __init__(self, root):
         self.root = root
         root.title("Ant Colony Optimization - TSP")
-        root.state("zoomed") 
+        root.state("zoomed")
+
+        # LAYOUT
+        root.columnconfigure(0, weight=0)
+        root.columnconfigure(1, weight=1)
         root.rowconfigure(0, weight=1)
-        root.columnconfigure(0, weight=1)
 
-        self.frame = ttk.Frame(root, padding=10)
-        self.frame.grid(row=0, column=0, sticky="nsew")
-        for i in range(6):
-            self.frame.rowconfigure(i, weight=0)
-        self.frame.rowconfigure(6, weight=1)
-        self.frame.columnconfigure(0, weight=1)
-        self.frame.columnconfigure(1, weight=1)
+        # PANEL IZQUIERDO
+        self.sidebar = ttk.Frame(root, padding=12)
+        self.sidebar.grid(row=0, column=0, sticky="ns")
 
-        ttk.Label(self.frame, text="Número de ciudades:").grid(row=0, column=0, sticky="e")
-        self.city_entry = ttk.Entry(self.frame, width=8)
-        self.city_entry.insert(0, "15")
-        self.city_entry.grid(row=0, column=1, sticky="w")
+        for i in range(30):
+            self.sidebar.rowconfigure(i, weight=0)
+        self.sidebar.rowconfigure(30, weight=1)
 
-        ttk.Label(self.frame, text="Iteraciones:").grid(row=1, column=0, sticky="e")
-        self.iter_entry = ttk.Entry(self.frame, width=8)
+        # PARAMETROS ACO
+        ttk.Label(self.sidebar, text="Parámetros ACO", foreground="red",
+                  font=("Segoe UI", 11, "bold")).grid(row=0, column=0, sticky="w", pady=(0, 6))
+
+        ttk.Label(self.sidebar, text="Hormigas (n_ants):").grid(row=1, column=0, sticky="w")
+        self.ants_entry = ttk.Entry(self.sidebar, width=10)
+        self.ants_entry.insert(0, "20")
+        self.ants_entry.grid(row=2, column=0, sticky="w", pady=2)
+
+        ttk.Label(self.sidebar, text="Alpha (feromona):").grid(row=3, column=0, sticky="w")
+        self.alpha_entry = ttk.Entry(self.sidebar, width=10)
+        self.alpha_entry.insert(0, "1.0")
+        self.alpha_entry.grid(row=4, column=0, sticky="w", pady=2)
+
+        ttk.Label(self.sidebar, text="Beta (heurística):").grid(row=5, column=0, sticky="w")
+        self.beta_entry = ttk.Entry(self.sidebar, width=10)
+        self.beta_entry.insert(0, "5.0")
+        self.beta_entry.grid(row=6, column=0, sticky="w", pady=2)
+
+        ttk.Label(self.sidebar, text="Evaporación:").grid(row=7, column=0, sticky="w")
+        self.evap_entry = ttk.Entry(self.sidebar, width=10)
+        self.evap_entry.insert(0, "0.5")
+        self.evap_entry.grid(row=8, column=0, sticky="w", pady=2)
+
+        ttk.Label(self.sidebar, text="Q (deposición):").grid(row=9, column=0, sticky="w")
+        self.q_entry = ttk.Entry(self.sidebar, width=10)
+        self.q_entry.insert(0, "100")
+        self.q_entry.grid(row=10, column=0, sticky="w", pady=2)
+
+        self.add_separator(11)
+
+        # ALEATORIOS
+        ttk.Label(self.sidebar, text="Ciudades Aleatorias",
+                  font=("Segoe UI", 10, "bold")).grid(row=12, column=0, sticky="w", pady=(5, 4))
+
+        ttk.Label(self.sidebar, text="Número de ciudades:").grid(row=13, column=0, sticky="w")
+        self.city_entry = ttk.Entry(self.sidebar, width=10)
+        self.city_entry.insert(0, "20")
+        self.city_entry.grid(row=14, column=0, sticky="w", pady=2)
+
+        self.add_separator(15)
+
+        # NO DE ITERACIONES
+        ttk.Label(self.sidebar, text="Iteraciones",
+                  font=("Segoe UI", 10, "bold")).grid(row=16, column=0, sticky="w", pady=(5, 4))
+
+        ttk.Label(self.sidebar, text="Número de iteraciones:").grid(row=17, column=0, sticky="w")
+        self.iter_entry = ttk.Entry(self.sidebar, width=10)
         self.iter_entry.insert(0, "50")
-        self.iter_entry.grid(row=1, column=1, sticky="w")
+        self.iter_entry.grid(row=18, column=0, sticky="w", pady=2)
 
-        ttk.Button(self.frame, text="Cargar TSPLIB", command=self.load_tsplib).grid(row=2, column=0, pady=4, sticky="ew")
-        ttk.Button(self.frame, text="Eliminar archivo", command=self.remove_tsplib).grid(row=2, column=1, pady=4, sticky="ew")
+        self.add_separator(19)
 
-        ttk.Button(self.frame, text="Ejecutar ACO", command=self.run_aco).grid(row=3, column=0, columnspan=2, pady=4)
+        # ARCHIVOS
+        ttk.Label(self.sidebar, text="Archivo TSPLIB",
+                  font=("Segoe UI", 10, "bold")).grid(row=20, column=0, sticky="w", pady=(5, 4))
 
-        self.source_label = ttk.Label(self.frame, text="Usando ciudades generadas aleatoriamente", foreground="gray")
-        self.source_label.grid(row=4, column=0, columnspan=2, pady=5)
+        ttk.Button(self.sidebar, text="Cargar TSPLIB", command=self.load_tsplib)\
+            .grid(row=21, column=0, sticky="ew", pady=3)
 
-        
-        self.fig, (self.ax_map, self.ax_evol) = plt.subplots(1, 2, figsize=(12, 6))
-        self.canvas = FigureCanvasTkAgg(self.fig, master=self.frame)
+        ttk.Button(self.sidebar, text="Eliminar archivo", command=self.remove_tsplib)\
+            .grid(row=22, column=0, sticky="ew", pady=3)
+
+        self.source_label = ttk.Label(self.sidebar, text="Usando ciudades aleatorias",
+                                      foreground="gray")
+        self.source_label.grid(row=23, column=0, pady=5)
+
+        self.add_separator(24)
+
+
+        ttk.Button(self.sidebar, text="Ejecutar ACO",
+                   command=self.run_aco, style="Accent.TButton")\
+            .grid(row=25, column=0, sticky="ew", pady=10)
+
+        self.fig, (self.ax_map, self.ax_evol) = plt.subplots(1, 2, figsize=(13, 6))
+        self.canvas = FigureCanvasTkAgg(self.fig, master=root)
         self.canvas_widget = self.canvas.get_tk_widget()
-        self.canvas_widget.grid(row=6, column=0, columnspan=2, sticky="nsew")
+        self.canvas_widget.grid(row=0, column=1, sticky="nsew", padx=5, pady=5)
 
         self.root.bind("<Configure>", self.on_resize)
 
         self.cities = None
         self.tsplib_path = None
 
+
+    def add_separator(self, row):
+        sep = ttk.Separator(self.sidebar, orient="horizontal")
+        sep.grid(row=row, column=0, sticky="ew", pady=7)
+
+
     def on_resize(self, event=None):
-        """Reajusta los gráficos cuando cambia el tamaño de la ventana."""
         self.fig.tight_layout()
         self.canvas.draw_idle()
 
+
     def load_tsplib(self):
-        """Permite seleccionar y cargar un archivo TSPLIB"""
         default_dir = os.path.join(os.getcwd(), "tsp")
         os.makedirs(default_dir, exist_ok=True)
 
@@ -78,33 +141,29 @@ class ACOApp:
                 num = len(self.cities)
 
                 self.source_label.config(
-                    text=f"Archivo TSPLIB cargado ({num} ciudades)",
+                    text=f"TSPLIB cargado ({num} ciudades)",
                     foreground="green"
                 )
-                self.city_entry.config(state="disabled")
-                messagebox.showinfo("Archivo cargado", f"Se cargaron {num} ciudades desde:\n{filepath}")
 
+                self.city_entry.config(state="disabled")
+                messagebox.showinfo("Archivo cargado", f"{num} ciudades cargadas.")
             except Exception as e:
-                messagebox.showerror("Error", f"No se pudo leer el archivo TSPLIB:\n{e}")
+                messagebox.showerror("Error", f"No se pudo leer el archivo:\n{e}")
+
 
     def remove_tsplib(self):
-        """Elimina el archivo cargado y vuelve al modo aleatorio"""
-        if self.cities is not None:
-            self.cities = None
-            self.tsplib_path = None
-            self.city_entry.config(state="normal")
-            self.source_label.config(
-                text="Usando ciudades generadas aleatoriamente",
-                foreground="gray"
-            )
-            messagebox.showinfo("Archivo eliminado", "Se ha eliminado el archivo TSPLIB cargado.")
+        self.cities = None
+        self.tsplib_path = None
+        self.city_entry.config(state="normal")
+        self.source_label.config(text="Usando ciudades aleatorias", foreground="gray")
+        messagebox.showinfo("Archivo eliminado", "Se ha eliminado el archivo TSPLIB.")
 
+    # EJECUTAR EL ALGORITMO
     def run_aco(self):
-        """Ejecuta el algoritmo ACO"""
         try:
             n_iterations = int(self.iter_entry.get())
         except ValueError:
-            messagebox.showerror("Error", "El número de iteraciones debe ser un número entero.")
+            messagebox.showerror("Error", "Iteraciones inválidas.")
             return
 
         if self.cities is not None:
@@ -113,12 +172,31 @@ class ACOApp:
             try:
                 n_cities = int(self.city_entry.get())
             except ValueError:
-                messagebox.showerror("Error", "El número de ciudades debe ser un número entero.")
+                messagebox.showerror("Error", "Número de ciudades inválido.")
                 return
             cities = generate_cities(n_cities)
 
+        try:
+            n_ants = int(self.ants_entry.get())
+            alpha = float(self.alpha_entry.get())
+            beta = float(self.beta_entry.get())
+            evap = float(self.evap_entry.get())
+            q = float(self.q_entry.get())
+        except ValueError:
+            messagebox.showerror("Error", "Parámetros ACO inválidos.")
+            return
+
         dist = distance_matrix(cities)
-        aco = AntColony(dist, n_ants=len(cities), n_iterations=n_iterations)
+        aco = AntColony(
+            dist,
+            n_ants=n_ants,
+            n_iterations=n_iterations,
+            alpha=alpha,
+            beta=beta,
+            evaporation_rate=evap,
+            q=q
+        )
+
         history = []
 
         def update_plot(iteration, best_route, best_length):
@@ -127,13 +205,11 @@ class ACOApp:
             history.append(best_length)
 
             pheromone = aco.pheromone
-            max_pher = pheromone.max() if pheromone.max() > 0 else 1
-            pheromone_norm = pheromone / max_pher
+            pher_norm = pheromone / max(pheromone.max(), 1e-9)
 
-            # Dibujar feromonas
             for i in range(len(cities)):
                 for j in range(i + 1, len(cities)):
-                    intensity = pheromone_norm[i, j]
+                    intensity = pher_norm[i, j]
                     if intensity > 0.01:
                         self.ax_map.plot(
                             [cities[i][0], cities[j][0]],
@@ -142,22 +218,20 @@ class ACOApp:
                             linewidth=1 + 3 * intensity
                         )
 
-            # Mejor ruta
             best_path = cities[best_route + [best_route[0]]]
             self.ax_map.plot(best_path[:, 0], best_path[:, 1], 'r-', linewidth=2.5)
             self.ax_map.scatter(cities[:, 0], cities[:, 1], c='black', s=40)
             self.ax_map.set_title(f"Iteración {iteration+1}/{n_iterations} - Mejor: {best_length:.2f}")
 
-            # Evolución
             self.ax_evol.plot(range(1, len(history)+1), history, 'r-o')
-            self.ax_evol.set_title("Evolución del mejor costo")
             self.ax_evol.set_xlabel("Iteración")
             self.ax_evol.set_ylabel("Distancia mínima")
+            self.ax_evol.set_title("Progreso")
 
             self.fig.tight_layout()
             self.canvas.draw()
             self.root.update()
-            time.sleep(0.2)
+            time.sleep(0.15)
 
         aco.run(callback=update_plot)
 
