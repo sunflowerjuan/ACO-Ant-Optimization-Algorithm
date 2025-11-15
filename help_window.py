@@ -8,7 +8,7 @@ class HelpWindow(tk.Toplevel):
         super().__init__(parent)
 
         self.title("Ayuda - Algoritmo ACO")
-        self.geometry("700x540")
+        self.geometry("800x600")
         self.resizable(False, False)
 
         container = ttk.Frame(self, padding=15)
@@ -16,7 +16,7 @@ class HelpWindow(tk.Toplevel):
 
         try:
             img = Image.open("img/logo.png")         
-            img = img.resize((70, 70), Image.LANCZOS) 
+            img = img.resize((120, 120), Image.LANCZOS) 
             self.logo = ImageTk.PhotoImage(img)
         except Exception:
             self.logo = None
@@ -31,7 +31,7 @@ class HelpWindow(tk.Toplevel):
         title = ttk.Label(
             header,
             text="Ayuda del Algoritmo ACO y Parámetros",
-            font=("Segoe UI", 16, "bold")
+            font=("Segoe UI", 18, "bold")
         )
         title.pack(side="left")
 
@@ -56,12 +56,12 @@ class HelpWindow(tk.Toplevel):
             "   - Alpha (importancia de la feromona):\n"
             "       Valores altos → las hormigas siguen rutas ya exploradas.\n"
             "       Valores bajos → la feromona tiene poco peso.\n"
-            "       Recomendado: 0.5 – 2.0\n\n"
+            "       Recomendado: 0.5 - 2.0\n\n"
 
             "   - Beta (importancia de la heurística / distancia):\n"
             "       Alto β → las hormigas priorizan las ciudades más cercanas.\n"
             "       Bajo β → decisión más aleatoria.\n"
-            "       Recomendado: 2 – 8\n\n"
+            "       Recomendado: 2 - 8\n\n"
 
             "   - Evaporación:\n"
             "       Controla qué tan rápido desaparece la feromona.\n"
@@ -74,13 +74,14 @@ class HelpWindow(tk.Toplevel):
             "       Q muy bajo → el aprendizaje es lento.\n\n"
 
             "4. Cómo usar la interfaz:\n"
-            "   - Puedes generar ciudades aleatorias o cargar un archivo TSPLIB.\n"
-            "   - Ajusta los parámetros del ACO según tu necesidad.\n"
+            "   - Puedes generar ciudades aleatorias o cargar un archivo TSPLIB con instancias de ciudades precargadas.\n"
+            "   - Ajusta los parámetros del ACO a tu antojo :b.\n"
+            "   - Selecciona el numero de iteraciones de la simulacion.\n"
             "   - Presiona Ejecutar ACO para iniciar la simulación.\n"
-            "   - El botón DETENER permite interrumpir el proceso.\n\n"
+            "   - El botón DETENER permite interrumpir la simulacion.\n\n"
         )
 
-        text_widget = tk.Text(container, wrap="word", font=("Segoe UI", 10), height=26)
+        text_widget = tk.Text(container, wrap="word", font=("Segoe UI", 12), height=26)
         text_widget.insert("1.0", text)
         text_widget.config(state="disabled")
         text_widget.pack(fill="both", expand=True)
