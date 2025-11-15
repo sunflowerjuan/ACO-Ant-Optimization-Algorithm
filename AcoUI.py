@@ -2,12 +2,13 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
-import numpy as np
 import time
 import os
 
 from aco import AntColony
 from tsp import generate_cities, distance_matrix, read_tsplib
+
+from help_window import HelpWindow
 
 
 class ACOApp:
@@ -31,59 +32,69 @@ class ACOApp:
             self.sidebar.rowconfigure(i, weight=0)
         self.sidebar.rowconfigure(59, weight=1)
 
+
+        try:
+            self.logo_img = tk.PhotoImage(file="img/logo.png")
+            self.logo_img = self.logo_img.subsample(10, 10)
+            ttk.Label(self.sidebar, image=self.logo_img).grid(row=0, column=0, pady=(0, 10))
+        except Exception:
+            ttk.Label(self.sidebar, text="[Logo no encontrado]").grid(row=0, column=0, pady=(0, 10))
+
         ttk.Label(self.sidebar, text="ACO - Parámetros",
-                  font=("Segoe UI", 13, "bold")).grid(row=0, column=0, sticky="w", pady=(0, 10))
+                  font=("Segoe UI", 13, "bold")).grid(row=1, column=0, sticky="w", pady=(0, 10))
 
         #PARAMETROS ACO
-        self.section("Parámetros del algoritmo", 1)
+        self.section("Parámetros del algoritmo", 2)
 
-        self.make_entry("Hormigas (n_ants):", "20", 2)
-        self.make_entry("Alpha (feromona):", "1.0", 4)
-        self.make_entry("Beta (heurística):", "5.0", 6)
-        self.make_entry("Evaporación:", "0.5", 8)
-        self.make_entry("Q (deposición):", "100", 10)
+        self.make_entry("Hormigas (n_ants):", "20", 3, attr="n_ants_entry")
+        self.make_entry("Alpha (feromona):", "1.0", 5, attr="alpha_entry")
+        self.make_entry("Beta (heurística):", "5.0", 7, attr="beta_entry")
+        self.make_entry("Evaporación:", "0.5", 9, attr="evap_entry")
+        self.make_entry("Q (deposición):", "100", 11, attr="q_entry")
 
-        self.add_separator(12)
+        self.add_separator(13)
 
         # ALEATORIOS
-        self.section("Ciudades aleatorias", 13)
+        self.section("Ciudades aleatorias", 14)
+        self.make_entry("Número de ciudades:", "20", 15, attr="city_entry")
 
-        self.make_entry("Número de ciudades:", "20", 14, attr="city_entry")
-
-        self.add_separator(16)
+        self.add_separator(17)
 
         # NO ITERACIONES 
-        self.section("Iteraciones", 17)
+        self.section("Iteraciones", 18)
+        self.make_entry("Iteraciones:", "50", 19, attr="iter_entry")
 
-        self.make_entry("Iteraciones:", "50", 18, attr="iter_entry")
-
-        self.add_separator(20)
+        self.add_separator(21)
 
         #ARCHIVOS
-        self.section("Archivo TSPLIB", 21)
+        self.section("Archivo TSPLIB", 22)
 
         ttk.Button(self.sidebar, text="Cargar archivo TSPLIB",
-                   command=self.load_tsplib).grid(row=22, column=0, sticky="ew", pady=3)
+                   command=self.load_tsplib).grid(row=23, column=0, sticky="ew", pady=3)
 
         ttk.Button(self.sidebar, text="Eliminar archivo",
-                   command=self.remove_tsplib).grid(row=23, column=0, sticky="ew", pady=3)
+                   command=self.remove_tsplib).grid(row=24, column=0, sticky="ew", pady=3)
 
         self.source_label = ttk.Label(self.sidebar, text="Usando ciudades aleatorias",
                                       foreground="gray")
-        self.source_label.grid(row=24, column=0, pady=5)
+        self.source_label.grid(row=25, column=0, pady=5)
 
-        self.add_separator(25)
-
+        self.add_separator(26)
 
         ttk.Button(self.sidebar, text="Ejecutar ACO",
                    command=self.run_aco,
-                   style="Accent.TButton").grid(row=26, column=0, sticky="ew", pady=8)
+                   style="Accent.TButton").grid(row=27, column=0, sticky="ew", pady=8)
 
         stop_btn = tk.Button(self.sidebar, text="DETENER",
                              bg="#b80808", fg="white",
                              font=("Segoe UI", 10, "bold"),
                              command=self.stop_execution)
-        stop_btn.grid(row=27, column=0, sticky="ew", pady=4)
+        stop_btn.grid(row=28, column=0, sticky="ew", pady=4)
+
+        # NUEVO BOTÓN AYUDA
+        help_btn = ttk.Button(self.sidebar, text="Ayuda",
+                              command=self.open_help)
+        help_btn.grid(row=29, column=0, sticky="ew", pady=14)
 
         #AREA DE GRAFICOS
         self.fig, (self.ax_map, self.ax_evol) = plt.subplots(1, 2, figsize=(13, 6))
@@ -97,8 +108,11 @@ class ACOApp:
         self.tsplib_path = None
 
 
-    # UTILIDADES DE UI
+    # NUEVA FUNCIÓN
+    def open_help(self):
+        HelpWindow(self.root)
 
+    # UTILIDADES DE UI
     def section(self, text, row):
         ttk.Label(self.sidebar, text=text,
                   font=("Segoe UI", 11, "bold")).grid(row=row, column=0,
@@ -112,10 +126,6 @@ class ACOApp:
 
         if attr:
             setattr(self, attr, entry)
-        else:
-            # nombre automático por label
-            name = label.split("(")[0].strip().lower().replace(" ", "_")
-            setattr(self, f"{name}_entry", entry)
 
     def add_separator(self, row):
         ttk.Separator(self.sidebar, orient="horizontal").grid(row=row, column=0,
@@ -124,7 +134,6 @@ class ACOApp:
     def on_resize(self, event=None):
         self.fig.tight_layout()
         self.canvas.draw_idle()
-
 
     # ARCHIVOS TSPLIB
     def load_tsplib(self):
@@ -136,16 +145,13 @@ class ACOApp:
             filetypes=[("TSPLIB files", "*.tsp"), ("All files", "*.*")],
             initialdir=default_dir
         )
-
         if filepath:
             try:
                 self.cities = read_tsplib(filepath)
                 self.tsplib_path = filepath
                 num = len(self.cities)
-
                 self.source_label.config(text=f"TSPLIB cargado ({num} ciudades)",
                                          foreground="green")
-
                 self.city_entry.config(state="disabled")
                 messagebox.showinfo("Archivo cargado", f"{num} ciudades cargadas.")
             except Exception as e:
@@ -158,24 +164,20 @@ class ACOApp:
         self.source_label.config(text="Usando ciudades aleatorias", foreground="gray")
         messagebox.showinfo("Archivo eliminado", "Archivo TSPLIB eliminado.")
 
-
     # BOTÓN STOP
     def stop_execution(self):
         self.stop_flag = True
 
-
-    # ALGORITMO ACO
+    # ALGORITMO ACO (sin cambios)
     def run_aco(self):
         self.stop_flag = False
 
-        # Iteraciones
         try:
             n_iterations = int(self.iter_entry.get())
         except ValueError:
             messagebox.showerror("Error", "Iteraciones inválidas.")
             return
 
-        # Ciudades
         if self.cities is not None:
             cities = self.cities
         else:
@@ -186,13 +188,12 @@ class ACOApp:
                 return
             cities = generate_cities(n_cities)
 
-        # Parámetros ACO
         try:
-            n_ants = int(self.hormigas__entry.get())
-            alpha = float(self.alpha__entry.get())
-            beta = float(self.beta__entry.get())
-            evap = float(self.evaporización__entry.get())
-            q = float(self.q__entry.get())
+            n_ants = int(self.n_ants_entry.get())
+            alpha = float(self.alpha_entry.get())
+            beta = float(self.beta_entry.get())
+            evap = float(self.evap_entry.get())
+            q = float(self.q_entry.get())
         except Exception:
             messagebox.showerror("Error", "Parámetros ACO inválidos.")
             return
@@ -213,7 +214,6 @@ class ACOApp:
         def update_plot(iteration, best_route, best_length):
             if self.stop_flag:
                 raise KeyboardInterrupt
-
             self.ax_map.clear()
             self.ax_evol.clear()
             history.append(best_length)
