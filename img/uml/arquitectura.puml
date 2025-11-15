@@ -1,0 +1,71 @@
+@startuml
+skinparam style strictuml
+skinparam backgroundColor #ffffff
+skinparam classAttributeIconSize 0
+
+title Arquitectura del Proyecto ACO - TSP
+
+'  Módulo main
+class Main {
+    +main()
+}
+
+' Clase UI 
+class ACOApp {
+    -sidebar
+    -fig
+    -ax_map
+    -ax_evol
+    -cities
+    -tsplib_path
+    -stop_flag
+
+    +__init__(root)
+    +run_aco()
+    +stop_execution()
+    +load_tsplib()
+    +remove_tsplib()
+    +open_help()
+    +on_resize()
+}
+
+'Ventana de ayuda 
+class HelpWindow {
+    +__init__(parent)
+}
+
+' Algoritmo ACO 
+class AntColony {
+    -pheromone
+    -dist_matrix
+    -n_ants
+    -alpha
+    -beta
+    -evaporation_rate
+    -q
+    -best_route
+    -best_length
+
+    +__init__(dist, n_ants, n_iterations, alpha, beta, evaporation_rate, q)
+    +run(callback)
+    +choose_next_city()
+    +update_pheromones()
+}
+
+class tsp <<util>> {
+    +generate_cities(n)
+    +distance_matrix(cities)
+    +read_tsplib(path)
+}
+
+Main --> ACOApp : crea instancia
+
+ACOApp --> HelpWindow : abre ayuda
+
+ACOApp --> AntColony : usa
+
+ACOApp --> tsp : usa
+
+AntColony --> tsp : depende de dist_matrix()
+
+@enduml
